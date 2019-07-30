@@ -2,18 +2,24 @@ import requests
 import time
 
 url='''
+
 '''
 
 url = url.split()
 port = "80"
 
+result =""
 for i in range(len(url)):
     temp = "http://"+url[i]+":"+port+"/robots.txt"
-    print(temp)
+    result += temp+"\n"
+    response = requests.get(temp)
+    text = response.text
     try:
-        response = requests.get(temp)
-        text = response.text
         if(text.index("Disallow")):
-            print(text)
+            result += text+"\n"
     except:
-        print("Not Found")
+        result += "Not Found"+"\n"
+
+print("\n\n\n")
+print("robots.txt Result")
+print(result)
