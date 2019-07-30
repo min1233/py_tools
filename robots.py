@@ -17,5 +17,3 @@ for i in range(len(url)):
             print(text)
     except:
         print("Not Found")
-    time.sleep(5)
-
