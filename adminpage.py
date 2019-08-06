@@ -18,7 +18,7 @@ def argu_check():
         return url,port
 
 def file_type_check(): # File type check
-    f = open('admin_page_list', mode='r')
+    f = open('page_list', mode='r')
     tmp = f.read().split()
     argu_size = len(sys.argv) # include allow file type in arguments
     file_type = ["htm","cfm","brf","cgi","js"]
