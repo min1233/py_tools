@@ -62,7 +62,6 @@ def admin_check(url,port,page): # check admin page (url:port/page)
                result += text
                print("\n"+bold+green+"[+]"+end+" "+temp)
                print(text)
-               break
        except:
            print("\n"+bold+red+"[-]"+end+" "+temp)
            print("Error\n")
