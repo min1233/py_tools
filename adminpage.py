@@ -50,7 +50,7 @@ def admin_check(url,port,page,error_text=""): # check admin page (url:port/page)
     
     true_false = error_text!=""
 
-    result = '\n\n\n----------------result----------------\n\n\n'
+    result = '----------------result----------------\n\n\n'
 
     for i in range(len(page)):
         try:
@@ -71,12 +71,13 @@ def admin_check(url,port,page,error_text=""): # check admin page (url:port/page)
         except:
             print("\n"+bold+red+"[-]"+end+" "+temp)
             print("Error\n")
+    result += "--------------------------------------"
     print(result)
     return result
 
 def save(url,result):
     s_index = url.find("//")+2
-    print("Save result, File Path : ",url[s_index:])
+    print("Save result, File Path : "+url[s_index:])
     f = open(url[s_index:],"w")
     f.write(result)
     f.close()
