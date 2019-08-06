@@ -43,34 +43,46 @@ def file_type_check(): # File type check
         return page
 
 def admin_check(url,port,page,error_text=""): # check admin page (url:port/page)
-   end = "\033[0m"
-   bold = "\033[1m"
-   red = "\033[31m"
-   green = "\033[32m"
-   result = '\n\n\n----------------result----------------\n\n\n'
-   true_false = error_text!=""
-   for i in range(len(page)):
-       try:
-           temp = url+":"+port+"/"+page[i]
-           response = requests.get(temp)
-           text = response.text
-           if(text.find("404")!=-1):
-               print("\n"+bold+red+"[-]"+end+" "+temp)
-               print("Not Found\n")
-           elif(true_false and text.find(error_text)!=-1):
-               print("\n"+bold+red+"[-]"+end+" "+temp)
-               print("Not Found\n")
-           else:
-               result += bold+green+"[+]"+end+" "+temp
-               result += text
-               print("\n"+bold+green+"[+]"+end+" "+temp)
-               print(text+"\n")
-       except:
-           print("\n"+bold+red+"[-]"+end+" "+temp)
-           print("Error\n")
-   print(result)
+    end = "\033[0m"
+    bold = "\033[1m"
+    red = "\033[31m"
+    green = "\033[32m"
+    
+    true_false = error_text!=""
+
+    result = '\n\n\n----------------result----------------\n\n\n'
+
+    for i in range(len(page)):
+        try:
+            temp = url+":"+port+"/"+page[i]
+            response = requests.get(temp)
+            text = response.text
+            if(text.find("404")!=-1):
+                print("\n"+bold+red+"[-]"+end+" "+temp)
+                print("Not Found\n")
+            elif(true_false and text.find(error_text)!=-1):
+                print("\n"+bold+red+"[-]"+end+" "+temp)
+                print("Not Found\n")
+            else:
+                result += bold+green+"[+]"+end+" "+temp
+                result += text
+                print("\n"+bold+green+"[+]"+end+" "+temp)
+                print(text+"\n")
+        except:
+            print("\n"+bold+red+"[-]"+end+" "+temp)
+            print("Error\n")
+    print(result)
+    return result
+
+def save(url,result):
+    s_index = url.find("//")+2
+    print("Save result, File Path : ",url[s_index:])
+    f = open(url[s_index:],"w")
+    f.write(result)
+    f.close()
 
 string_404= raw_input("Pleas enter the text that appeares when the program can`t find admin page.\nIf you want to use the default value, Press the Enter (default=404) : ")
 url,port = argu_check()
 page = file_type_check()
-admin_check(url,port,page,string_404)
+result = admin_check(url,port,page,string_404)
+save(url,result)
