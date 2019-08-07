@@ -42,7 +42,7 @@ def file_type_check(): # File type check
     else:
         return page
 
-def admin_check(url,port,page,error_text=""): # check admin page (url:port/page)
+def admin_check(url,port,page,path,error_text): # check admin page (url:port/page)
     end = "\033[0m"
     bold = "\033[1m"
     red = "\033[31m"
@@ -54,7 +54,7 @@ def admin_check(url,port,page,error_text=""): # check admin page (url:port/page)
 
     for i in range(len(page)):
         try:
-            temp = url+":"+port+"/"+page[i]
+            temp = url+":"+port+"/"+path+page[i]
             response = requests.get(temp)
             text = response.text
             if(text.find("404")!=-1):
@@ -82,8 +82,9 @@ def save(url,result):
     f.write(result)
     f.close()
 
-string_404= raw_input("Pleas enter the text that appeares when the program can`t find admin page.\nIf you want to use the default value, Press the Enter (default=404) : ")
+path= raw_input("Please enter the path that append when the program find admin page.( Ex : homepage/ )\nIf you don`t want to use this function, Press the Enter : ")
+error_text= raw_input("\nPleas enter the text that appeares when the program can`t find admin page.\nIf you want to use the default value, Press the Enter (default=404) : ")
 url,port = argu_check()
 page = file_type_check()
-result = admin_check(url,port,page,string_404)
+result = admin_check(url,port,page,path,error_text)
 save(url,result)
