@@ -56,7 +56,8 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
         try:
             temp = url+":"+port+"/"+path+page[i]
             response = requests.get(temp)
-            text = response.content
+            response.encoding = None # fix up breaking hangul
+            text = response.text
             if(text.find("404")!=-1):
                 print("\n"+bold+red+"[-]"+end+" "+temp)
                 print("Not Found\n")
@@ -80,7 +81,7 @@ def save(url,result):
     s_index = url.find("//")+2
     print("Save result, File Path : "+url[s_index:])
     f = open(url[s_index:],"w")
-    f.write(result)
+    f.write(result.encode('utf-8')) # fix up breaking hangul
     f.close()
 
 path= raw_input("Please enter the path that append when the program find admin page.( Ex : homepage/ )\nIf you don`t want to use this function, Press the Enter : ")
