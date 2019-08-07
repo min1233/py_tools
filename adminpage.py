@@ -65,7 +65,7 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
                 print("\n"+bold+red+"[-]"+end+" "+temp)
                 print("Not Found\n")
             else:
-                result += "\n"+bold+green+"[+]"+end+" "+temp
+                result += "\n"+bold+green+"[+]"+end+" "+temp+"\n"
                 result += text+"\n"
                 print("\n"+bold+green+"[+]"+end+" "+temp)
                 print(text+"\n")
