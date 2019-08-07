@@ -50,13 +50,13 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
     
     true_false = error_text!=""
 
-    result = '----------------result----------------\n\n\n'
+    result = "----------------result----------------\n"
 
     for i in range(len(page)):
         try:
             temp = url+":"+port+"/"+path+page[i]
             response = requests.get(temp)
-            text = response.text
+            text = response.content
             if(text.find("404")!=-1):
                 print("\n"+bold+red+"[-]"+end+" "+temp)
                 print("Not Found\n")
@@ -64,14 +64,15 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
                 print("\n"+bold+red+"[-]"+end+" "+temp)
                 print("Not Found\n")
             else:
-                result += bold+green+"[+]"+end+" "+temp
-                result += text
+                result += "\n"+bold+green+"[+]"+end+" "+temp
+                result += text+"\n"
                 print("\n"+bold+green+"[+]"+end+" "+temp)
                 print(text+"\n")
         except:
             print("\n"+bold+red+"[-]"+end+" "+temp)
             print("Error\n")
-    result += "--------------------------------------"
+
+    result += "--------------------------------------\n"
     print(result)
     return result
 
