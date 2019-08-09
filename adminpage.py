@@ -9,6 +9,11 @@ def menu():
     print("-"*30)
     return input(">> ")
 
+def print_result(result):
+    print("-"*30)
+    print(result)
+    print("-"*30)
+
 def argu_check():
     argu_size = len(sys.argv)
     if(argu_size==1):
@@ -58,7 +63,7 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
     
     true_false = error_text!=""
 
-    result = "----------------result----------------\n"
+    result = ""
     for i in range(len(page)):
         try:
             temp = url+":"+port+"/"+path+page[i]
@@ -80,17 +85,15 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
             print("\n"+bold+red+"[-]"+end+" "+temp)
             print("Error\n")
             print(ex)
-
-    result += "--------------------------------------\n"
-    print(result)
+    print_result(result)
     return result
 
-def robots(port):
+def robots():
     f = open("url_list","r")
     url = f.read().split()
-    result = "----------------result----------------\n\n"
+    result =""
     for i in range(len(url)):
-        temp = url[i]+":"+port+"/robots.txt"
+        temp = url[i]+"/robots.txt"
         result += temp+"\n"
         try:
             response = requests.get(temp)
@@ -98,16 +101,14 @@ def robots(port):
             result += text+"\n\n"
         except:
             result += "Not Found"+"\n"
-    result += "--------------------------------------\n"
-    print("\nrobots.txt Result")
-    print(result)
+    print_result(result)
     return result
 
 def save(file_name,result):
     file_name = file_name.replace(":","")
     file_name = file_name.replace("/","_")
     print("Save result, File Path : "+file_name)
-    f = open(file_name,"w")
+    f = open(file_name,"a")
     f.write(result.encode('utf-8')) # fix up breaking hangul
     f.close()
 
@@ -120,6 +121,5 @@ if num==1:
     result = admin_check(url,port,page,path,error_text)
     save(url[s_index:]+path,result)
 elif num==2:
-    port = raw_input("Please enter the scan port : ")
-    result = robots(port)
+    result = robots()
     save("robots.txt",result)
