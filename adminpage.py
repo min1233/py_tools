@@ -119,7 +119,7 @@ if num==1:
     url,port = argu_check()    
     page = file_type_check()
     result = admin_check(url,port,page,path,error_text)
-    save(url[s_index:]+path,result)
+    save(url+path,result)
 elif num==2:
     result = robots()
     save("robots.txt",result)
