@@ -546,3 +546,10 @@ wp-login.cgi
 wp-login.js
 wp-login.jsp
 wp-login.php
+opmanager/
+opmanager/index.jsp
+opmanager/index.php
+opmanager/index.asp
+opmanager/login.jsp
+opmanager/login.php
+opmanager/login.asp
