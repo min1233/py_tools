@@ -163,7 +163,6 @@ def telnet_connect(host,user,password):
     tn.read_some()
 
     result = "ID : "+user+", Password : "+password
-    time.sleep(5)
     result += tn.read_some()+"\n\n"
     tn.close()
 
