@@ -51,6 +51,8 @@ def file_type_check(): # File type check
                     raise NotImplementedError
                 for k in file_type:
                     if(tmp[i].find(k)!=-1):
+                        if(k=="js" and tmp[i].find("jsp")!=-1):
+                            continue
                         raise NotImplementedError
                 for j in range(1,argu_size):
                     if(tmp[i].find(sys.argv[j])!=-1):
