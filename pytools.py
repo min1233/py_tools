@@ -70,9 +70,12 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
     red = "\033[31m"
     green = "\033[32m"
     
-    true_false = error_text!=""
-
     result = ""
+    if_val = 0 # 0 == false, 1 == true
+    size = len(error_text)
+
+    requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += 'HIGH:!DH:!aNULL' # Fix up dh too small error
+
     for i in range(len(page)):
         try:
             temp = url+":"+port+"/"+path+page[i]
@@ -80,16 +83,26 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
             response.encoding = None # fix up breaking hangul
             text = response.text
             if(text.find("404")!=-1):
-                print("\n"+bold+red+"[-]"+end+" "+temp)
-                print("Not Found\n")
-            elif(true_false and text.find(error_text)!=-1):
-                print("\n"+bold+red+"[-]"+end+" "+temp)
-                print("Not Found\n")
+                if_val = 0
+            elif(size!=0):
+                for error in error_text:
+                    if(text.find(error)!=-1):
+                        if_val = 0
+                        break
+                    else:
+                        if_val = 1
             else:
+                if_val = 1
+
+            if(if_val!=0):
                 result += "\n"+bold+green+"[+]"+end+" "+temp+"\n"
                 result += text+"\n"
                 print("\n"+bold+green+"[+]"+end+" "+temp)
                 print(text+"\n")
+            else:
+                print("\n"+bold+red+"[-]"+end+" "+temp)
+                print("Not Found\n")
+                
         except Exception as ex:
             print("\n"+bold+red+"[-]"+end+" "+temp)
             print("Error\n")
@@ -175,7 +188,11 @@ while(1):
         num = menu()
         if num==1:
             path= raw_input("Please enter the path that append when the program find admin page.( Ex : homepage/ )\nIf you don`t want to use this function, Press the Enter : ")
-            error_text= raw_input("\nPleas enter the text that appeares when the program can`t find admin page.\nIf you want to use the default value, Press the Enter (default=404) : ")
+            error_text=[]
+            while(1):
+                tmp= raw_input("\nPleas enter the text that appeares when the program can`t find admin page.\nIf you want to use the default value, Press the Enter (default=404) : ")
+                if(tmp==""): break
+                error_text.append(tmp)
             url,port = argu_check()    
             page = file_type_check()
             result = admin_check(url,port,page,path,error_text)
