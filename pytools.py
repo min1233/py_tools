@@ -23,7 +23,7 @@ def menu():
 
 def argu_check():
     argu_size = len(sys.argv)
-    if(argu_size==1):
+    if(argu_size<=2):
         print("Programe needs arguments.")
         print("Example) python ./adminpage.py http://url port [file type]")
         exit(0)
@@ -31,13 +31,12 @@ def argu_check():
         if(sys.argv[1].find("http")==-1):
             print("Schema must be included")
             exit(0)
-            
         url = sys.argv.pop(1)
         port = sys.argv.pop(1)
         return url,port
 
 def file_type_check(): # File type check
-    f = open('page_list', mode='r')
+    f = open('data/page_list', mode='r')
     tmp = f.read().split()
     argu_size = len(sys.argv) # include allow file type in arguments
     #file_type = ["htm","cfm","brf","cgi","js"]
@@ -111,7 +110,7 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
     return result
 
 def robots():
-    f = open("url_list","r")
+    f = open("data/url_list","r")
     url = f.read().split()
     result =""
     for i in range(len(url)):
@@ -126,18 +125,24 @@ def robots():
     print_result(result)
     return result
 
-def save(file_name,result):
+def save(url,port,path,result,mode=""): # change arguments
+    if(path!=""): path = "/"+path
+    file_name = url+":"+port+path
+    if(mode=="admin"):
+        f = open("data/checked_url.txt","a")
+        f.write(file_name+"\n")
+        f.close()
     file_name = file_name.replace(":","")
     file_name = file_name.replace("/","_")
-    print("Save result, File Path : "+file_name)
-    f = open(file_name,"a")
+    print("Save result, File Path : ./result/"+file_name)
+    f = open("result/"+file_name,"a")
     f.write(result.encode('utf-8')) # fix up breaking hangul
     f.close()
 
 def create_email_file():
     pattern = re.compile("[a-z0-9]*@[^-]*")
-    cred = open("cred","r")
-    email = open("email","w")
+    cred = open("data/cred","r")
+    email = open("data/email","w")
 
     save_email(cred,email,pattern)
 
@@ -150,8 +155,8 @@ def find_email():
     string = raw_input("Enter the domain you want to search for in email file >> ") # python 2.7
     pattern = re.compile(".*@.*"+string+".*")
     
-    email = open("email","r")
-    result = open(string,"w")
+    email = open("data/email","r")
+    result = open("result/"+string,"w")
     
     save_email(email,result,pattern)
 
@@ -183,46 +188,54 @@ def telnet_connect(host,user,password):
 
     return result
 
-while(1):
-    try:
-        num = menu()
-        if num==1:
-            path= raw_input("Please enter the path that append when the program find admin page.( Ex : homepage/ )\nIf you don`t want to use this function, Press the Enter : ")
-            error_text=[]
-            while(1):
-                tmp= raw_input("\nPleas enter the text that appeares when the program can`t find admin page.\nIf you want to use the default value, Press the Enter (default=404) : ")
-                if(tmp==""): break
-                error_text.append(tmp)
-            url,port = argu_check()    
-            page = file_type_check()
-            result = admin_check(url,port,page,path,error_text)
-            save(url+path,result)
-        elif num==2:
-            result = robots()
-            save("robots.txt",result)
-        elif num==3:
-            create_email_file()
-        elif num==4:
-            find_email()
-        elif num==5:
-            host = raw_input("telnet IP : ")
-            u = open("user","r")
-            p = open("Attack password","r")
-            result =""
+def check_url(url,port,path):
+    f = open("data/checked_url.txt","r")
+    url_list = f.read()
+    if(path!=""): path = "/"+path
+    url = url+":"+port+path
 
-            user_list = u.read().split()
-            password_list = p.read().split()
-
-            for user in user_list:
-                for password in password_list:
-                    tmp  = telnet_connect(host,user,password)
-                    print(tmp)
-                    result += tmp
-            print(result)
-            save(host+"telnet",result)
-            u.close()
-            p.close()
-        elif num==0:
-            break
-    except:
-        pass
+    pattern = re.compile(url+"[\s]")
+    if(pattern.findall(url_list)):
+        print("This url Checked admin pages")
+        exit(0)
+    else:
+        return 1
+   
+num = menu()
+if num==1:
+    url,port = argu_check()    
+    path= raw_input("Please enter the path that append when the program find admin page.( Ex : homepage/ )\nIf you don`t want to use this function, Press the Enter : ")
+    check_url(url,port,path)
+    error_text=[]
+    while(1):
+        tmp= raw_input("\nPleas enter the text that appeares when the program can`t find admin page.\nIf you want to use the default value, Press the Enter (default=404) : ")
+        if(tmp==""): break
+        error_text.append(tmp)
+    page = file_type_check()
+    result = admin_check(url,port,page,path,error_text)
+    save(url,port,path,result,"admin")
+elif num==2:
+    result = robots()
+    save("robots.txt",result)
+elif num==3:
+    create_email_file()
+elif num==4:
+    find_email()
+elif num==5:
+    host = raw_input("telnet IP : ")
+    u = open("data/user","r")
+    p = open("data/Attack password","r")
+    result =""
+    user_list = u.read().split()
+    password_list = p.read().split()
+    for user in user_list:
+        for password in password_list:
+            tmp  = telnet_connect(host,user,password)
+            print(tmp)
+            result += tmp
+    print(result)
+    save(host,"23","",result)
+    u.close()
+    p.close()
+elif num==0:
+    exit(0)
