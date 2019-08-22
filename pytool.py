@@ -4,6 +4,11 @@ import time
 import sys
 import re
 
+end = "\033[0m"
+bold = "\033[1m"
+red = "\033[31m"
+green = "\033[32m"
+
 def print_result(result):
     print("-"*30)
     print(result)
@@ -22,27 +27,30 @@ def menu():
 
 
 def argu_check():
-    argu_size = len(sys.argv)
-    if(argu_size<=2):
-        print("Programe needs arguments.")
-        print("Example) python ./adminpage.py http://url port [file type]")
+    f = open("data/target_url","r")
+    tmp1 = f.read().split("\n")
+    tmp1.pop()
+    argu = []
+    if(len(tmp1)==0):
+        print("Program needs arguments")
+        print("Please read data/README.md")
         exit(0)
-    if(argu_size>2):
-        if(sys.argv[1].find("http")==-1):
-            print("Schema must be included")
+    for c in tmp1:
+        tmp2 = c.split()
+        if(len(tmp2)<2):
+            print("Example\nhttp://example.com 80\nhttps://example.com 443 jsp")
             exit(0)
-        url = sys.argv.pop(1)
-        port = sys.argv.pop(1)
-        return url,port
+        argu.append(c.split()) # two dimensional array
+    return argu
 
-def file_type_check(): # File type check
+def file_type_check(search_type): # File type check
     f = open('data/page_list', mode='r')
     tmp = f.read().split()
-    argu_size = len(sys.argv) # include allow file type in arguments
+    argu_size = len(search_type) # include allow file type in arguments
     #file_type = ["htm","cfm","brf","cgi","js"]
     file_type = ["htm","js"]
     page = []
-    if argu_size!=1:
+    if argu_size!=0:
         for i in range(0,len(tmp)):
             try:
                 result = 0
@@ -53,8 +61,8 @@ def file_type_check(): # File type check
                         if(k=="js" and tmp[i].find("jsp")!=-1):
                             continue
                         raise NotImplementedError
-                for j in range(1,argu_size):
-                    if(tmp[i].find(sys.argv[j])!=-1):
+                for j in range(0,argu_size):
+                    if(tmp[i].find(search_type[j])!=-1):
                         raise NotImplementedError
             except:
                 page.append(tmp[i])
@@ -64,10 +72,6 @@ def file_type_check(): # File type check
         return page
 
 def admin_check(url,port,page,path,error_text): # check admin page (url:port/page)
-    end = "\033[0m"
-    bold = "\033[1m"
-    red = "\033[31m"
-    green = "\033[32m"
     
     result = ""
     if_val = 0 # 0 == false, 1 == true
@@ -78,6 +82,7 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
     for i in range(len(page)):
         try:
             temp = url+":"+port+"/"+path+page[i]
+            print(temp)
             response = requests.get(temp)
             response.encoding = None # fix up breaking hangul
             text = response.text
@@ -133,11 +138,11 @@ def save(url,port,path,result,mode=""): # change arguments
         f.write(file_name+"\n")
         f.close()
         if(result==""):
-            print("The tool didn`t find Vuln ant don`t save")
-            exit(0)
+            print(bold+red+"[-] "+end+"The tool didn`t find Vuln ant don`t save\n\n")
+            return 1
     file_name = file_name.replace(":","")
     file_name = file_name.replace("/","_")
-    print("Save result, File Path : ./result/"+file_name)
+    print("Save result, File Path : ./result/"+file_name+"\n\n")
     f = open("result/"+file_name,"a")
     f.write(result.encode('utf-8')) # fix up breaking hangul
     f.close()
@@ -196,27 +201,36 @@ def check_url(url,port,path):
     url_list = f.read()
     if(path!=""): path = "/"+path
     url = url+":"+port+path
-
+    print("\n\n"+bold+url+end)
     pattern = re.compile(url+"[\s]")
     if(pattern.findall(url_list)):
-        print("This url Checked admin pages")
-        exit(0)
+        print(bold+red+"[-] "+end+"This url Checked admin pages\n\n")
+        return 0
     else:
         return 1
-   
+
+def target_pop(target):
+    url = target.pop(0)
+    port = target.pop(0)
+    file_type = target
+    return url,port,file_type
+
 num = menu()
 if num==1:
-    url,port = argu_check()    
-    path= raw_input("Please enter the path that append when the program find admin page.( Ex : homepage/ )\nIf you don`t want to use this function, Press the Enter : ")
-    check_url(url,port,path)
-    error_text=[]
-    while(1):
-        tmp= raw_input("\nPleas enter the text that appeares when the program can`t find admin page.\nIf you want to use the default value, Press the Enter (default=404) : ")
-        if(tmp==""): break
-        error_text.append(tmp)
-    page = file_type_check()
-    result = admin_check(url,port,page,path,error_text)
-    save(url,port,path,result,"admin")
+    target_list = argu_check()
+    for target in target_list:
+        url,port,search_type = target_pop(target)
+        print(url+":"+port)
+        path= raw_input("Please enter the path that append when the program find admin page.( Ex : homepage/ )\nIf you don`t want to use this function, Press the Enter : ")
+        if(check_url(url,port,path)):
+            error_text=[]
+            while(1):
+                tmp= raw_input("\nPleas enter the text that appeares when the program can`t find admin page.\nIf you want to use the default value, Press the Enter (default=404) : ")
+                if(tmp==""): break
+                error_text.append(tmp)
+            page = file_type_check(search_type)
+            result = admin_check(url,port,page,path,error_text)
+            save(url,port,path,result,"admin")
 elif num==2:
     result = robots()
     save("robots.txt",result)
