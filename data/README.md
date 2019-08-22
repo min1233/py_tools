@@ -1,5 +1,4 @@
 <h1>target_url</h1>
-<br><br>
 <h2>Schema://url port [file type]
 <br><br>
 Example</h2>
