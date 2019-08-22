@@ -1,7 +1,7 @@
 <h1>target_url</h1>
 <strong>Schema://url port [file type]
-<br><br>>
-Example></strong>
+<br><br>
+Example</strong>
 
 http://example.com 80
 
