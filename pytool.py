@@ -83,7 +83,7 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
         try:
             temp = url+":"+port+"/"+path+page[i]
             print(temp)
-            response = requests.get(temp)
+            response = requests.get(temp, timeout=10) # 10 sec after timeout exception
             response.encoding = None # fix up breaking hangul
             text = response.text
             if(text.find("404")!=-1):
