@@ -99,7 +99,7 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
                 if_val = 1
 
             if(if_val!=0):
-                result += "\n"+bold+green+"[+]"+end+" "+temp+"\n"
+                result += "\n"+temp+"\n"
                 result += text+"\n"
                 print("\n"+bold+green+"[+]"+end+" "+temp)
                 print(text+"\n")
