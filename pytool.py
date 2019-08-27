@@ -3,6 +3,9 @@ import telnetlib
 import time
 import sys
 import re
+from itertools import product
+import hashlib
+import time
 
 end = "\033[0m"
 bold = "\033[1m"
@@ -20,6 +23,7 @@ def menu():
 3. create email file tools
 4. find specific email in email file
 5. Telnet Brute Force Attack
+6. find sha256 hash
 0. exit'''
     print_result(menu)
     
@@ -106,7 +110,7 @@ def admin_check(url,port,page,path,error_text): # check admin page (url:port/pag
             else:
                 print("\n"+bold+red+"[-]"+end+" "+temp)
                 print("Not Found\n")
-                
+
         except Exception as ex:
             print("\n"+bold+red+"[-]"+end+" "+temp)
             print("Error\n")
@@ -155,17 +159,16 @@ def create_email_file():
     save_email(cred,email,pattern)
 
     print("Regular expression search complete")
-    cred.close()    
+    cred.close()
     email.close()
-    
 
 def find_email():
     string = raw_input("Enter the domain you want to search for in email file >> ") # python 2.7
     pattern = re.compile(".*@.*"+string+".*")
-    
+
     email = open("data/email","r")
     result = open("result/"+string,"w")
-    
+
     save_email(email,result,pattern)
 
     print("Regular expression search complete")
@@ -215,6 +218,25 @@ def target_pop(target):
     file_type = target
     return url,port,file_type
 
+def hashing(hash_data):
+	hashSHA = hashlib.sha256()
+	chars = '0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm!@#'	# Chars Dictionary
+	confirm = 0
+
+	for length in range(1, 20):	# length 1 to 4
+	    print(length)
+	    to_attempt = product(chars, repeat=length)
+	    for attempt in to_attempt:
+	        brute = ''.join(attempt)
+	        hashSHA.update(brute.encode("utf-8"))
+	        tmp = hashSHA.hexdigest()
+        	hashSHA = hashlib.sha256()
+	        if(tmp==hash_data):
+	            print("Decrypt : "+brute)
+	            confirm = 1
+        	    break
+	    if(confirm):
+	        break
 num = menu()
 if num==1:
     target_list = argu_check()
@@ -254,5 +276,8 @@ elif num==5:
     save(host,"23","",result)
     u.close()
     p.close()
+elif num==6:
+    hash_data = raw_input("Please enter the sha256 hash : ")
+    hashing(hash_data)
 elif num==0:
     exit(0)
