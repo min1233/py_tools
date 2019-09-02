@@ -29,7 +29,7 @@ def debug2(url,url_path1,url_path2):
 
 def file_type_check(url,check_list):
         for file_type in check_list:
-                if(url.find(file_type)):
+                if(url.find(file_type)!=-1):
                         return 1
         return 0
 
@@ -113,13 +113,23 @@ def check(url_list,find_list):
 	return_value = []
 	check_list = ["jpg","png","gif","pdf","mp4","exe","tgz","ids"]
 	for url in find_list:
+		path1 = re.compile(":[0-9]+") # find port regex
+		port1 = path1.findall(url)
+		if(port1==[]): port1 = ""
+		else: port1 = port1[0]
+
 		index1 = url.find("//")+2 # scheam://
 		if(url.find(find_text)==-1): continue
 		elif(file_type_check(url,check_list)): continue
 		true_false1 = 1
 		for url2 in url_list:
+			path2 = re.compile(":[0-9]+") # find port regex
+			port2 = path2.findall(url2)
+			if(port2==[]): port2 = ""
+			else: port2 = port2[0]
+
 			index2 = url2.find("//")+2 # schema://
-			if(url[index1:]!=url2[index2:]): # check after except schema
+			if(url[index1:].replace(port1,"")!=url2[index2:].replace(port2,"")): # check after except schema
 				continue
 			else:
 				true_false1 = 0
@@ -159,7 +169,7 @@ for i,tmp in enumerate(url_list):
 		th.start()
 		threads.append(th)
 	else:
-		print("Count : "+str(i)+" / len(url_list) : "+str(len(url_list)))
+		print("\nCount : "+str(i)+" / len(url_list) : "+str(len(url_list)))
 		th_main(tmp)
 
 for th in threads:
