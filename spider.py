@@ -180,6 +180,7 @@ for i,tmp in enumerate(url_list):
 		count = 0
 		for th in threads:
 			th.join()
+			threads.pop(0)
 
 for th in threads:
 	th.join()
