@@ -5,7 +5,8 @@ import time
 from collections import OrderedDict # remove duplication in Order
 
 lock = threading.Lock()
-sem = threading.Semaphore(10)
+t_max = 10
+sem = threading.Semaphore(t_max)
 
 url = raw_input("Enter the url : ")
 find_text = raw_input("Enter the find text : ")
@@ -111,7 +112,7 @@ def reg(data,tmp):
 def check(url_list,find_list):
 	lock.acquire()
 	return_value = []
-	check_list = ["jpg","png","gif","pdf","mp4","exe","tgz","ids"]
+	check_list = [".jpg",".png",".gif",".pdf",".mp4",".exe",".tgz",".ids",".xls"]
 	for url in find_list:
 		path1 = re.compile(":[0-9]+") # find port regex
 		port1 = path1.findall(url)
@@ -160,17 +161,25 @@ def th_main(tmp):
 start = time.time()
 threads = []
 true_false2 = 0 # thread start
+count = 0
+
 for i,tmp in enumerate(url_list):
 	if(len(url_list)-i>3):true_false2 = 1
 	else: true_false2 = 0
 
 	if(true_false2):
+		count = count+1
 		th = threading.Thread(target=th_main,args=(tmp,))
 		th.start()
 		threads.append(th)
 	else:
 		print("\nCount : "+str(i)+" / len(url_list) : "+str(len(url_list)))
 		th_main(tmp)
+
+	if(count==t_max):
+		count = 0
+		for th in threads:
+			th.join()
 
 for th in threads:
 	th.join()
