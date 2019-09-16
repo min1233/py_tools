@@ -2,10 +2,14 @@ import requests
 import re
 import threading
 import time
+import sys
 from collections import OrderedDict # remove duplication in Order
 
+reload(sys) # fix bug - ascii range(1280
+sys.setdefaultencoding('utf-8')
+
 lock = threading.Lock()
-t_max = 10
+t_max = 20
 sem = threading.Semaphore(t_max)
 
 url = raw_input("Enter the url : ")
@@ -139,11 +143,9 @@ def check(url_list,find_list):
 			return_value.append(url)
 	if(return_value!=[]):
 		for tmp2 in return_value:	
-			try:
-				f.write(tmp2+"\n")
-				url_list.append(tmp2)
-			except:
-				print("File Write Error")
+			f.write(tmp2+"\n")
+			url_list.append(tmp2)
+
 	#debug(url_list)
 	lock.release()
 	return 1
@@ -173,7 +175,7 @@ for i,tmp in enumerate(url_list):
 		th.start()
 		threads.append(th)
 	else:
-		print("\nCount : "+str(i)+" / len(url_list) : "+str(len(url_list)))
+		print("\nCount : "+str(i)+" / len(url_list) : "+str(len(url_list)-1))
 		th_main(tmp)
 
 	if(count==t_max):
@@ -188,6 +190,6 @@ for th in threads:
 f.close()
 debug(url_list)
 
-
+print("Search Count : "+str(i))
 print("end")
 print(time.time()-start)	
