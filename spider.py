@@ -1,12 +1,8 @@
-import requests
+import urllib2
 import re
 import threading
 import time
-import sys
 from collections import OrderedDict # remove duplication in Order
-
-reload(sys) # fix bug - ascii range(1280
-sys.setdefaultencoding('utf-8')
 
 lock = threading.Lock()
 t_max = 20
@@ -77,10 +73,8 @@ def slush_remove(path):
 
 def url_request(url):
 	try:
-		requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += 'HIGH:!DH:!aNULL' # Fix up dh too small error
-		rep = requests.get(url,timeout=20)
-        	rep.encoding = None # fix up breaking hangul
-		text = rep.text
+		rep = urllib2.urlopen(url,timeout=5)
+		text = rep.read()
 		rep.close()
 		return text
 	except Exception as e:
@@ -178,7 +172,7 @@ for i,tmp in enumerate(url_list):
 		print("\nCount : "+str(i)+" / len(url_list) : "+str(len(url_list)-1))
 		th_main(tmp)
 
-	if(count==t_max):
+	if(count==t_max or not(true_false2)):
 		count = 0
 		for th in threads:
 			th.join()
