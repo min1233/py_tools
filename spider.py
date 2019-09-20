@@ -68,6 +68,17 @@ def url_process2(url):
 	url = url[:index1]+url[index1:].replace("//","/")
         return url
 
+def pattern_check(data,check_list): # src="path/filename.filetype
+        result = []
+        regular = '''[\"\'][\w\#\?\.\-&=_%/()]*'''
+        for file_type in check_list:
+                pattern4 = re.compile(regular+file_type.replace(".","\.")+"\W") # chagne Regular
+                tmp = pattern4.findall(data)
+                if(tmp):
+                        result = result + tmp
+        return result
+
+
 def slush_remove(path):
 	path = path.replace("\\","")[1:]
 	if(path[0]=="/"): path = path[1:]
@@ -91,9 +102,11 @@ def reg(data,tmp):
 	pattern3 = re.compile("[\"\'][\.]+/[\w\#\?\.\-&=_%/()]*") # chagne Regular
 
 	tmp2 = list(OrderedDict.fromkeys(pattern.findall(data))) # http://example.com
-	tmp3 = list(OrderedDict.fromkeys(pattern2.findall(data))) # http://example.com
-	tmp4 = list(OrderedDict.fromkeys(pattern3.findall(data))) # http://example.com
+	tmp3 = list(OrderedDict.fromkeys(pattern2.findall(data))) # /Absolute Path
+	tmp4 = list(OrderedDict.fromkeys(pattern3.findall(data))) # ./Relative Path
 
+	check_list = [".js",".html",".jsp",".php",".asp"]
+	tmp5 = list(OrderedDict.fromkeys(pattern_check(data,check_list))) # Relative Path
 
 	for c in tmp2:
 		url = c.replace("\\","")
@@ -107,7 +120,9 @@ def reg(data,tmp):
 	for c in tmp4:
 		url = url_process2(url_path2+c.replace("\\","")[1:])
 		tmp1.append(url)
-
+	for c in tmp5:
+		url = url_process2(url_path2+c.replace("\'","").replace("\"",""))
+		tmp1.append(url)
 	return list(OrderedDict.fromkeys(tmp1))
 
 def check(url_list,find_list):
